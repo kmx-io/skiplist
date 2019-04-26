@@ -1,6 +1,8 @@
 #ifndef SKIPLIST_H
 #define SKIPLIST_H
 
+#include <math.h>
+
 typedef struct skiplist_node {
         void *value;
         unsigned height;
@@ -23,9 +25,10 @@ typedef struct skiplist {
 
 s_skiplist *  new_skiplist (int max_height, double spacing);
 int               skiplist_compare_ptr (void *a, void *b);
+unsigned          skiplist_random_height (s_skiplist *sl);
 s_skiplist_node * skiplist_pred (s_skiplist *sl, void *value);
 s_skiplist_node * skiplist_insert (s_skiplist *sl, void *value);
-void              skiplist_delete (s_skiplist *sl, s_skiplist_node *n);
+void *            skiplist_delete (s_skiplist *sl, void *value);
 s_skiplist_node * skiplist_find (s_skiplist *sl, void *value);
 void       delete_skiplist (s_skiplist *sl);
 

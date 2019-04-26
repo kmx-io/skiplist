@@ -105,7 +105,7 @@ s_skiplist_node * skiplist_pred (s_skiplist *sl, void *value)
         assert(pred);
         while (level--) {
                 s_skiplist_node *n = node;
-                while (n && sl->compare(value, n->value) < 0) {
+                while (n && sl->compare(n->value, value) < 0) {
                         node = n;
                         n = skiplist_node_next(n, level);
                 }
@@ -150,17 +150,23 @@ s_skiplist_node * skiplist_insert (s_skiplist *sl, void *value)
         return n;
 }
 
-void skiplist_delete (s_skiplist *sl, s_skiplist_node *n)
+void * skiplist_delete (s_skiplist *sl, void *x)
 {
         unsigned level;
-        s_skiplist_node *pred = skiplist_pred(sl, n);
+        s_skiplist_node *pred = skiplist_pred(sl, x);
+        s_skiplist_node *n = skiplist_node_next(pred, 0);
+        void *value;
+        if (!n || sl->compare(n->value, x) != 0)
+                return NULL;
         for (level = 0; level < n->height; level++) {
                 s_skiplist_node *p = skiplist_node_next(pred, level);
                 skiplist_node_next(p, level) = skiplist_node_next(n, level);
         }
+        value = n->value;
         delete_skiplist_node(pred);
         delete_skiplist_node(n);
         sl->length--;
+        return value;
 }
 
 s_skiplist_node * skiplist_find (s_skiplist *sl, void *value)
@@ -170,7 +176,7 @@ s_skiplist_node * skiplist_find (s_skiplist *sl, void *value)
         while (level--) {
                 s_skiplist_node *n = node;
                 int c;
-                while (n && (c = sl->compare(value, n->value)) < 0)
+                while (n && (c = sl->compare(n->value, value)) < 0)
                         n = skiplist_node_next(n, level);
                 if (c == 0)
                         return n;
